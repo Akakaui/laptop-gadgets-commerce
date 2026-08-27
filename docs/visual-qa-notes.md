@@ -54,3 +54,7 @@ The latest local API check passed health, demo login, six catalog products, Lago
 The product model and editor now support reusable physical-product fields including category, SKU, price, comparison price, stock, limited inventory, condition, colours, sizes/options, weight, tags, variants, specifications, ratings, and review counts. The storefront includes configurable business messaging, category-driven browse cards, product detail options, published reviews, and email signup. The admin includes review moderation, email-lead visibility, and appearance settings.
 
 The new API routes were smoke-tested: public reviews returned successfully, settings returned the default business configuration, invalid email signup returned 400, valid signup created a lead, and the protected lead route enforced the local demo session boundary. The QA lead was removed with the seed reset before delivery.
+
+## Optional-field catalog QA
+
+Product creation was tested with only `id`, `name`, `price`, `stock`, and `limited`. The API accepted the product, returned it from the public catalog, and allowed it to be removed without requiring SKU, brand, category, condition, description, specifications, colours, sizes, weight, tags, variants, ratings, or an image. The editor now starts new products with blank optional fields and supports adding custom attribute name/value rows; only entered attributes are rendered on the storefront.

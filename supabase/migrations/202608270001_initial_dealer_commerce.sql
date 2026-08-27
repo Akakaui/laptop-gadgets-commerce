@@ -46,12 +46,12 @@ create table if not exists public.categories (
 create table if not exists public.products (
   id text primary key,
   category_id uuid references public.categories(id) on delete set null,
-  category text not null default 'Laptops',
+  category text,
   name text not null,
   slug text not null unique,
-  brand text not null,
-  condition text not null default 'New',
-  description text not null default '',
+  brand text,
+  condition text,
+  description text,
   price numeric(14,2) not null check (price >= 0),
   compare_at numeric(14,2) check (compare_at is null or compare_at >= price),
   image_tone text,
@@ -258,3 +258,11 @@ alter table public.products add column if not exists variants jsonb not null def
 alter table public.products add column if not exists tags jsonb not null default '[]'::jsonb;
 alter table public.products add column if not exists rating numeric(2,1) not null default 0;
 alter table public.products add column if not exists review_count integer not null default 0;
+
+alter table public.products add column if not exists image_url text;
+alter table public.products alter column category drop not null;
+alter table public.products alter column category drop default;
+alter table public.products alter column brand drop not null;
+alter table public.products alter column condition drop not null;
+alter table public.products alter column description drop not null;
+alter table public.products alter column description drop default;
