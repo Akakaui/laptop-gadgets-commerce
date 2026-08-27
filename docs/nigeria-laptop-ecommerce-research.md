@@ -36,3 +36,9 @@
 ## Architecture constraint
 
 The customer explicitly asked not to host in Manus. Therefore the build should remain portable: conventional Node/TypeScript project, environment-variable configuration, database migrations, provider adapters, seed data, Docker/managed-hosting instructions, and no dependency on Manus-only runtime features. The initial implementation can run with demo/mock providers, then switch to live Paystack/Flutterwave/GIGL credentials through environment variables.
+
+## Supabase architecture research
+
+Supabase's official Row Level Security documentation states that RLS provides granular authorization inside Postgres and recommends enabling RLS on every table in an exposed schema. It also warns that adding policies does not revoke existing grants, and that the `service_role` bypasses RLS and must remain server-side. Source: https://supabase.com/docs/guides/database/postgres/row-level-security
+
+Implication for this ecommerce app: storefront-readable product/category data should use narrow public `SELECT` policies; customer/order/admin data should not be exposed to the anonymous browser; owner/staff operations should use authenticated Supabase users plus role checks, and any server-side service key must stay in the API environment.

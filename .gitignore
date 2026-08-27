@@ -6,3 +6,8 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Runtime database files
+data/*.sqlite
+data/*.sqlite-*
+data/store.json

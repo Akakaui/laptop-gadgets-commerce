@@ -8,7 +8,9 @@
 - Products, orders, analytics, shipping quote, coupon validation, product CRUD, and order creation endpoints are present.
 - Paystack initialization falls back to a clearly labelled demo response when a live secret is absent.
 - Payment webhook endpoint is idempotent by recorded event identifier.
-- Local JSON persistence can be replaced behind the server layer before high-volume production use.
+- Supabase is the production repository when `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are configured; SQLite is offline fallback only.
+- The Supabase migration enables RLS on every exposed table, limits anonymous reads to active catalog data, and protects admin/customer/payment data.
+- `npm run supabase:seed` is run only with the server-only service key and succeeds on a migrated project.
 
 ## Browser flows verified
 
@@ -36,4 +38,4 @@
 
 ## Known limitations before launch
 
-Live Paystack/Flutterwave credentials, GIGL credentials, dealer-specific catalog photos, notification transport, authentication/role permissions, database migration to PostgreSQL/MySQL, and policy content still require dealer handoff work. These are explicitly documented rather than simulated as complete.
+Live Paystack/Flutterwave credentials, GIGL credentials, dealer-specific catalog photos, notification transport, final Supabase Auth user creation, policy content, and provider account configuration still require dealer handoff work. The production migration, RLS policies, Supabase repository adapter, Storage bucket policies, seed command, security headers, rate limiting, and signed webhook boundary are included rather than simulated as missing.

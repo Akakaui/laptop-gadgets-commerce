@@ -2,7 +2,7 @@
 
 ## Executive summary
 
-Kora Commerce is a portable ecommerce starter for Nigerian laptop and gadget dealers. It now includes a customer storefront, cart and checkout journey, a dealer admin dashboard, a portable Express API, local persistence for demos, provider-ready payment and delivery boundaries, and documentation for third-party deployment. The implementation is committed to the selected GitHub repository at commit `c0b0d32`.
+Kora Commerce is a portable ecommerce starter for Nigerian laptop and gadget dealers. It now includes a customer storefront, cart and checkout journey, a dealer admin dashboard, a portable Express API, local persistence for demos, provider-ready payment and delivery boundaries, and documentation for third-party deployment. The implementation is committed to the dedicated GitHub repository at the latest pushed commit after the Supabase migration. The original agentic-chatbot repository has been restored to its pre-commerce commit and no longer contains this product.
 
 The product direction is deliberately suitable for a ₦50,000–₦100,000 dealer launch package: the core is reusable, the visual identity can be changed, and the merchant-specific work is isolated into catalog loading, credentials, policies, domain, and hosting handoff rather than buried in one-off code.
 
@@ -22,27 +22,27 @@ GIG Logistics states that its APIs can automate shipments, enable real-time trac
 |---|---|
 | Storefront | Sticky navigation, search, category browse, product detail, specs, condition, colors, stock messaging, cart, coupon, city selection, payment method selection, and order confirmation |
 | Admin | Overview metrics, revenue chart, low-stock watch, product catalog CRUD, edit drawer, stock increment/decrement, limited-stock flag, order statuses, coupon toggles, customer conversations, analytics, store settings, and integration readiness |
-| API | Health, products, product CRUD, orders, order status, coupon validation, analytics, shipping quote, Paystack initialization placeholder, and idempotent Paystack webhook record |
-| Portability | Vite + React frontend, Express server, environment-variable template, `npm run build`, `npm run start`, no Manus hosting dependency |
+| API | Health, products, product CRUD, orders, order status, coupon validation, analytics, shipping quote, shipment creation, Paystack initialize/verify/webhook, admin login/session hooks, and idempotent payment-event recording |
+| Portability | Vite + React frontend, Express server, Supabase migrations/seed command, environment-variable template, Dockerfile, Compose file, `npm run build`, `npm run start`, and no Manus hosting dependency |
 | Documentation | Design system, brief, user flows, capability matrix, asset manifest, tool requests, QA checklist, research notes, and visual QA notes |
 
 ## Verification performed
 
 The type check and production build pass with `npm run lint` and `npm run build`. The local API health endpoint returns a successful response. The browser review verified the storefront first screen, admin overview, product manager, product editor drawer, inventory restock view, cart, checkout fields, coupon calculation, cash-on-delivery selection, and pending-confirmation order success state. A temporary QA order was removed after endpoint testing so the committed demo store remains clean.
 
-A repair was required during QA: an admin setter was initially passed as the selected product value, which caused the product drawer to render during the storefront view. The state wiring was separated, the app reloaded correctly, and the build passed afterward. The implementation uses an honest provider-ready state; it does not claim that live gateway or logistics credentials are connected.
+A repair was required during QA: an admin setter was initially passed as the selected product value, which caused the product drawer to render during the storefront view. The state wiring was separated, the app reloaded correctly, and the build passed afterward. A later native SQLite driver crash was diagnosed and eliminated by using Node 22’s built-in SQLite only for the offline fallback. The production path now uses Supabase when `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are configured. The implementation uses an honest provider-ready state; it does not claim that live gateway or logistics credentials are connected.
 
 ## Deployment outside Manus
 
-Deploy the repository to Render, Railway, Fly.io, a VPS, or another Node host. Build with `npm run build`, start with `npm run start`, and configure `.env` values in the host dashboard. The server serves `dist` and the API under `/api`. Attach the dealer’s domain and TLS through the selected provider. For real multi-user operation, migrate the JSON repository to PostgreSQL/MySQL and add authentication and staff roles before launch.
+Deploy the repository to Render, Railway, Fly.io, a VPS, or another Node host. Create a Supabase project, run the SQL migration in `supabase/migrations/`, configure Supabase Auth users and the `profiles` roles, run `npm run supabase:seed` with the server-only service key, then deploy with `npm run build` and `npm run start`. The server serves `dist` and the API under `/api`. Attach the dealer’s domain and TLS through the selected provider. Docker deployment is also provided for a VPS or managed container host.
 
 | Launch layer | Demo implementation | Production handoff |
 |---|---|---|
-| Persistence | `data/store.json` | PostgreSQL/MySQL repository with migrations and backups |
+| Persistence | Supabase Postgres via `server/supabase-store.ts`; local SQLite is offline fallback only | Supabase project with migration, RLS, backups, and seed command |
 | Payments | Provider-ready UI plus Paystack demo fallback | Paystack or Flutterwave secret, hosted checkout, transaction verification, signed webhook, idempotency |
 | Delivery | Manual city rates for Lagos, Abuja, Port Harcourt, Ibadan, and Other | GIGL or another logistics API for live quote, shipment, tracking, and reverse logistics |
 | Notifications | Local admin conversation demo | WhatsApp, email, SMS, or support inbox transport |
-| Access control | Demo workspace | Owner/staff authentication, roles, audit trail, rate limits |
+| Access control | Demo workspace or password session | Supabase Auth bearer validation can be enabled with `SUPABASE_AUTH_REQUIRED=true`; RLS policies enforce owner/staff access |
 | Catalog media | Local hero asset and CSS product scenes | Dealer-owned photos, storage bucket, product image upload and optimization |
 
 ## Commercial packaging recommendation

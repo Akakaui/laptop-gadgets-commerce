@@ -36,3 +36,15 @@ The storefront return and add-to-cart flow worked. The cart count incremented to
 The cart screen rendered a clear line item, quantity controls, remove action, subtotal, delivery estimate, and checkout CTA. Checkout exposed customer fields, Nigerian city choices, delivery address, Paystack checkout, bank transfer, cash on delivery, coupon code, and provider-ready messaging. Demo data entered with a non-personal placeholder successfully applied `WELCOME5`, showing a 5% discount and recalculated total without ambiguity.
 
 Selecting Cash on delivery changed the CTA to “Place order”. Submitting the completed demo order showed a success screen with order reference `KOR-1049`, pending confirmation, nationwide delivery, support contact, and a continue-shopping action. The customer-facing success state did not falsely claim payment completion.
+
+## Dedicated repository recheck
+
+The dedicated `laptop-gadgets-commerce` repository served the storefront independently on the standard Vite port, with the same clear hero, category, product, and trust hierarchy. Opening Dealer admin demo successfully showed the admin overview against the new API path. The admin authentication gate is demo-open when `DEMO_MODE` is active and becomes password-protected when `NODE_ENV=production` plus `ADMIN_PASSWORD` and `SESSION_SECRET` are configured.
+
+The first dedicated API process exposed a native SQLite driver crash; this was diagnosed with a saved Node 22 compatibility check and repaired by switching to the built-in `node:sqlite` runtime. The dedicated API then started successfully, created SQLite storage, and served health, auth, products, shipping, coupon, order, and stock-deduction checks.
+
+## Supabase production-path QA
+
+The dedicated repository now includes a Supabase migration with catalog, variants/spec fields, product images, customers, orders, coupons, shipments, conversations, payment events, profiles, RLS policies, and the `product-images` Storage bucket. `server/supabase-store.ts` uses Supabase when `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are configured and falls back to local SQLite only when those production variables are absent.
+
+The latest local API check passed health, demo login, six catalog products, Lagos shipping quote, coupon validation, and provider-ready payment initialization. Production-mode auth checks returned 401 for unauthenticated orders, 401 for a wrong password, 200 for the configured owner login, and 200 for public product reads. TypeScript and production builds pass after the Supabase migration.

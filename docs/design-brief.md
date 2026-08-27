@@ -22,7 +22,7 @@ The dealer sells both new and refurbished devices. Delivery zones and fees are c
 
 ## Technical direction
 
-Use a portable Vite + React frontend with an Express API server. The demo API persists to a local JSON store so it launches with minimal infrastructure; the `server` layer isolates the persistence and payment/shipping adapters so it can later be swapped for PostgreSQL, MySQL, or a hosted commerce backend. Secrets remain server-side. Webhooks update order payment state idempotently.
+Use a portable Vite + React frontend with an Express API server. Production data lives in Supabase Postgres, with Supabase Auth for owner/staff sessions and Supabase Storage for product media; the server keeps the service-role key private. The local SQLite seed remains only as an offline demo fallback. Payment and shipping adapters are server-side, and signed webhooks update order payment state idempotently.
 
 ## Visual direction
 
