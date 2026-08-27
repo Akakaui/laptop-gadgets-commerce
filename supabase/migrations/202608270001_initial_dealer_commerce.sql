@@ -238,7 +238,7 @@ create table if not exists public.storefront_appearance (
   address text,
   currency text not null default 'NGN',
   announcement text,
-  enabled_features jsonb not null default '{"reviews":true,"emailCapture":true,"variants":true,"delivery":true}'::jsonb,
+  enabled_features jsonb not null default '{"reviews":true,"emailCapture":true,"variants":true,"delivery":true,"coupons":true,"chat":true,"cod":true,"analytics":true,"wishlist":false,"payments":true}'::jsonb,
   updated_at timestamptz not null default now()
 );
 
