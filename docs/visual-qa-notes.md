@@ -48,3 +48,9 @@ The first dedicated API process exposed a native SQLite driver crash; this was d
 The dedicated repository now includes a Supabase migration with catalog, variants/spec fields, product images, customers, orders, coupons, shipments, conversations, payment events, profiles, RLS policies, and the `product-images` Storage bucket. `server/supabase-store.ts` uses Supabase when `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are configured and falls back to local SQLite only when those production variables are absent.
 
 The latest local API check passed health, demo login, six catalog products, Lagos shipping quote, coupon validation, and provider-ready payment initialization. Production-mode auth checks returned 401 for unauthenticated orders, 401 for a wrong password, 200 for the configured owner login, and 200 for public product reads. TypeScript and production builds pass after the Supabase migration.
+
+## General-purpose kit QA
+
+The product model and editor now support reusable physical-product fields including category, SKU, price, comparison price, stock, limited inventory, condition, colours, sizes/options, weight, tags, variants, specifications, ratings, and review counts. The storefront includes configurable business messaging, category-driven browse cards, product detail options, published reviews, and email signup. The admin includes review moderation, email-lead visibility, and appearance settings.
+
+The new API routes were smoke-tested: public reviews returned successfully, settings returned the default business configuration, invalid email signup returned 400, valid signup created a lead, and the protected lead route enforced the local demo session boundary. The QA lead was removed with the seed reset before delivery.

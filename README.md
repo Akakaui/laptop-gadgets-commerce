@@ -1,6 +1,6 @@
 # Kora Commerce
 
-Kora Commerce is a portable full-stack ecommerce starter for Nigerian laptop and gadget dealers. It includes a polished storefront and a dealer control room for products, inventory, orders, coupons, customer conversations, settings, and analytics.
+Kora Commerce is a portable, copyable full-stack ecommerce website kit for any business that sells physical products online or offline. Copy the repository for each client, rebrand the storefront, load the client’s catalog, and deploy it as that business’s own independent website. It works for clothing, shoes, gadgets, laptops, beauty, home goods, accessories, computer parts, food products, and other physical retail categories.
 
 > This project is intentionally **not hosted in Manus**. It is a conventional Vite + React frontend with an Express API that can be deployed on a VPS or a third-party Node host.
 
@@ -8,11 +8,11 @@ Kora Commerce is a portable full-stack ecommerce starter for Nigerian laptop and
 
 | Surface | Included capability |
 |---|---|
-| Storefront | Responsive home page, category browsing, search, product details, specs, conditions, colors, cart, coupon code, checkout, city-based delivery estimate, order confirmation |
-| Admin | Dashboard metrics, revenue chart, inventory watch, catalog CRUD, price/stock/limited flags, specifications, order status, coupon management, conversation inbox, analytics, store settings |
-| API | Product CRUD, order creation/status, coupons, analytics, shipping quote, shipment creation, Paystack initialize/verify/webhook, admin login/session hook, and health check |
+| Storefront | Responsive home page, configurable branding, category browsing, search, product details, SKU/specifications, condition, colours, sizes, weight, options, ratings/reviews, cart, coupon code, email signup, checkout, city-based delivery estimate, order confirmation |
+| Admin | Dashboard metrics, revenue chart, inventory watch, catalog CRUD, categories, price/stock/limited flags, SKU/specifications, sizes, colours, weight, variants/options, order status, coupon management, conversation inbox, review moderation, email leads, appearance/settings, analytics |
+| API | Product/category-ready catalog reads and CRUD, order creation/status with stock deduction, coupons, analytics, shipping quote, shipment creation, review submission/moderation, email lead capture, appearance settings, Paystack initialize/verify/webhook, admin login/session hook, and health check |
 | Integrations | Server-side Paystack initialization path, Flutterwave/GIGL readiness notes, manual shipping and demo fallbacks |
-| Data | SQLite persistence in `data/kora.sqlite`, seeded from committed `data/seed.json`; use PostgreSQL/MySQL when the dealer outgrows the single-instance starter |
+| Data | Supabase Postgres, RLS, Auth hooks, Storage bucket policies, and a repeatable seed migration; local SQLite is an offline demo fallback only |
 
 ## Local launch
 
@@ -46,7 +46,10 @@ Copy `.env.example` to `.env` for the API process. Never commit real credentials
 | `FLW_SECRET_KEY` | Reserved for the Flutterwave adapter |
 | `FLW_SECRET_HASH` | Reserved for Flutterwave webhook verification |
 | `GIGL_API_KEY` | Switches shipping quote metadata to the GIGL adapter when the account is configured |
-| `DATABASE_PATH` | Optional SQLite file path; defaults to `data/kora.sqlite` |
+| `SUPABASE_URL` | Client’s Supabase project URL; required for production database mode |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only Supabase key; never expose it in frontend code |
+| `SUPABASE_AUTH_REQUIRED` | Set `true` to require Supabase Auth bearer sessions on admin API routes |
+| `DATABASE_PATH` | Optional offline-demo SQLite path; not the production data store |
 | `ADMIN_USERNAME` | Production admin username, defaults to `admin` |
 | `ADMIN_PASSWORD` | Production admin password; required when `NODE_ENV=production` |
 | `SESSION_SECRET` | Session signing secret; use at least 32 random characters |
@@ -54,9 +57,9 @@ Copy `.env.example` to `.env` for the API process. Never commit real credentials
 
 ## Deployment outside Manus
 
-The simplest route is a Node host such as Render, Railway, Fly.io, or a VPS. Build the app with `npm run build`, start it with `npm run start`, and configure the environment variables in the host dashboard. Attach the dealer's custom domain and TLS certificate through the host. The starter uses SQLite with WAL mode and atomic snapshot writes, which is suitable for a small single-instance dealer deployment. If the store needs multiple application instances or high concurrency, move the repository layer to PostgreSQL/MySQL.
+The simplest route is a Node host such as Render, Railway, Fly.io, or a VPS with a separate Supabase project for that client. Run the migration in `supabase/migrations/`, create the client’s Auth owner, run `npm run supabase:seed`, then build with `npm run build`, start with `npm run start`, and configure the environment variables in the host dashboard. Attach the client’s custom domain and TLS certificate through the host.
 
-The server serves the built frontend from `dist` and exposes API routes under `/api`. A reverse proxy is not required on managed Node hosts. On a VPS, use a process manager such as systemd or PM2 and place Nginx/Caddy in front of the Node process. Docker deployment is provided with `Dockerfile` and `docker-compose.yml`; the compose volume persists the SQLite database across restarts.
+The server serves the built frontend from `dist` and exposes API routes under `/api`. A reverse proxy is not required on managed Node hosts. On a VPS, use a process manager such as systemd or PM2 and place Nginx/Caddy in front of the Node process. Docker deployment is provided with `Dockerfile` and `docker-compose.yml`. Each copied project can use its own Supabase project, domain, credentials, brand, and catalog without sharing customer data with another business.
 
 ## Live payments and delivery
 
@@ -74,4 +77,4 @@ Replace the demo Kora identity, copy, catalog data, and hero asset. Add dealer-o
 
 ## Key files
 
-`src/App.tsx` contains the storefront/admin UI and demo workflows. `src/index.css` contains the living visual system. `server/index.ts` contains the portable API. `server/db.ts` contains the SQLite data layer. `data/seed.json` is the committed demo seed and `data/kora.sqlite` is created at runtime. `Dockerfile`, `docker-compose.yml`, and `.env.example` cover deployment. `design.md`, `docs/design-brief.md`, `docs/user-flows.md`, `docs/asset-manifest.md`, `docs/qa-checklist.md`, and `docs/visual-qa-notes.md` document the product and its verification.
+`src/App.tsx` contains the storefront/admin UI and reusable demo workflows. `src/index.css` contains the living visual system. `server/index.ts` contains the portable API. `server/supabase-store.ts` contains the production Supabase adapter, while `server/db.ts` contains the offline SQLite fallback. `supabase/migrations/202608270001_initial_dealer_commerce.sql` defines the production schema, RLS, Auth roles, and Storage policies. `data/seed.json` is the committed demo seed. `Dockerfile`, `docker-compose.yml`, `.env.example`, and `.github/workflows/ci.yml` cover deployment and verification. `docs/supabase-production-setup.md`, `docs/design-brief.md`, `docs/user-flows.md`, `docs/asset-manifest.md`, `docs/qa-checklist.md`, and `docs/visual-qa-notes.md` document the product and its handoff.

@@ -204,3 +204,57 @@ create policy "public can view product images" on storage.objects for select to 
 create policy "staff can upload product images" on storage.objects for insert to authenticated with check (bucket_id = 'product-images' and public.is_staff_or_owner());
 create policy "staff can update product images" on storage.objects for update to authenticated using (bucket_id = 'product-images' and public.is_staff_or_owner()) with check (bucket_id = 'product-images' and public.is_staff_or_owner());
 create policy "staff can delete product images" on storage.objects for delete to authenticated using (bucket_id = 'product-images' and public.is_staff_or_owner());
+
+create table if not exists public.reviews (
+  id uuid primary key default gen_random_uuid(),
+  product_id text not null references public.products(id) on delete cascade,
+  product_name text not null,
+  customer text not null,
+  rating integer not null check (rating between 1 and 5),
+  comment text not null,
+  status text not null default 'Pending' check (status in ('Published', 'Pending', 'Hidden')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.email_subscribers (
+  id uuid primary key default gen_random_uuid(),
+  email text not null unique,
+  source text not null default 'storefront',
+  status text not null default 'Subscribed' check (status in ('Subscribed', 'Unsubscribed')),
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.storefront_appearance (
+  id uuid primary key default gen_random_uuid(),
+  store_name text not null default 'Kora Computers',
+  tagline text not null default 'Good gear. Clear choices.',
+  logo_url text,
+  hero_url text,
+  primary_color text not null default '#c9f25b',
+  support_phone text,
+  support_email text,
+  whatsapp_number text,
+  address text,
+  currency text not null default 'NGN',
+  announcement text,
+  enabled_features jsonb not null default '{"reviews":true,"emailCapture":true,"variants":true,"delivery":true}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.reviews enable row level security;
+alter table public.email_subscribers enable row level security;
+alter table public.storefront_appearance enable row level security;
+create policy "public can view published reviews" on public.reviews for select to anon, authenticated using (status = 'Published');
+create policy "public can subscribe" on public.email_subscribers for insert to anon, authenticated with check (status = 'Subscribed');
+create policy "staff can manage reviews" on public.reviews for all to authenticated using (public.is_staff_or_owner()) with check (public.is_staff_or_owner());
+create policy "staff can manage subscribers" on public.email_subscribers for all to authenticated using (public.is_staff_or_owner()) with check (public.is_staff_or_owner());
+create policy "staff can manage appearance" on public.storefront_appearance for all to authenticated using (public.is_staff_or_owner()) with check (public.is_staff_or_owner());
+
+alter table public.products add column if not exists sku text;
+alter table public.products add column if not exists weight text;
+alter table public.products add column if not exists sizes jsonb not null default '[]'::jsonb;
+alter table public.products add column if not exists variants jsonb not null default '[]'::jsonb;
+alter table public.products add column if not exists tags jsonb not null default '[]'::jsonb;
+alter table public.products add column if not exists rating numeric(2,1) not null default 0;
+alter table public.products add column if not exists review_count integer not null default 0;

@@ -2,11 +2,11 @@
 
 ## Product
 
-A reusable ecommerce starter for Nigerian laptop and gadget dealers. It is designed to be rebranded and deployed on a dealer-owned domain or hosting account. The first working demo uses a realistic seeded catalog and a dealer admin surface; live payment, shipping, email, and chat credentials are configured through environment variables.
+A reusable ecommerce website kit for physical-product businesses. It is copied, rebranded, and deployed separately for each client on that client’s own domain or hosting account; it is not a multi-tenant SaaS. The same core can support clothing, shoes, gadgets, laptops, beauty, home goods, accessories, computer parts, and other retail categories. Live payment, shipping, email, and chat credentials are configured through environment variables.
 
 ## Primary audiences
 
-The buyer is a Nigerian consumer or small business shopping for a laptop, phone, monitor, accessory, or refurbished device. The operator is a dealer or store assistant who manages catalog, inventory, prices, orders, coupons, delivery, customer chat, and revenue.
+The buyer is a consumer or small business shopping for any physical product. The operator is the business owner or store assistant who manages catalog, categories, inventory, prices, variants, sizes, weights, orders, coupons, delivery, customer chat, reviews, email leads, and revenue.
 
 ## Success criteria
 
@@ -14,7 +14,7 @@ A customer can discover a product, inspect configuration, add it to cart, choose
 
 ## Information architecture
 
-Storefront routes are home, catalog, product detail, cart, checkout, order confirmation, and customer order lookup. Admin routes are dashboard, products, inventory, orders, deliveries, coupons, conversations, analytics, and settings. The demo presents these surfaces with a storefront/admin switch so a buyer can experience the entire product in one preview.
+Storefront routes are home, catalog, product detail, cart, checkout, order confirmation, reviews, email signup, and customer order lookup. Admin routes are dashboard, products, categories, inventory, orders, deliveries, coupons, conversations, review moderation, email leads, analytics, appearance, and settings. The demo presents these surfaces with a storefront/admin switch so a buyer can experience the entire product in one preview.
 
 ## Assumptions
 
@@ -22,7 +22,7 @@ The dealer sells both new and refurbished devices. Delivery zones and fees are c
 
 ## Technical direction
 
-Use a portable Vite + React frontend with an Express API server. Production data lives in Supabase Postgres, with Supabase Auth for owner/staff sessions and Supabase Storage for product media; the server keeps the service-role key private. The local SQLite seed remains only as an offline demo fallback. Payment and shipping adapters are server-side, and signed webhooks update order payment state idempotently.
+Use a portable Vite + React frontend with an Express API server. Each copied client project has its own Supabase Postgres database, Auth users, Storage bucket, domain, and credentials; there is no shared tenant layer. The server keeps the Supabase service-role key private. The local SQLite seed remains only as an offline demo fallback. Payment and shipping adapters are server-side, and signed webhooks update order payment state idempotently.
 
 ## Visual direction
 
