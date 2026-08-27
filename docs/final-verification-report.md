@@ -1,0 +1,60 @@
+# Kora Commerce — final verification and sales handoff
+
+## Executive summary
+
+Kora Commerce is a portable ecommerce starter for Nigerian laptop and gadget dealers. It now includes a customer storefront, cart and checkout journey, a dealer admin dashboard, a portable Express API, local persistence for demos, provider-ready payment and delivery boundaries, and documentation for third-party deployment. The implementation is committed to the selected GitHub repository at commit `c0b0d32`.
+
+The product direction is deliberately suitable for a ₦50,000–₦100,000 dealer launch package: the core is reusable, the visual identity can be changed, and the merchant-specific work is isolated into catalog loading, credentials, policies, domain, and hosting handoff rather than buried in one-off code.
+
+## Research findings that shaped the build
+
+A current SLOT Nigeria laptop category page exposes search, account, wishlist, cart, store locator, customer service, warranty policy, physical address, support numbers, social links, and local payment badges. That supports treating **trust, warranty, offline presence, and support** as first-class storefront content rather than optional footer details.[1]
+
+Paystack’s official payment documentation states that Nigerian merchants can use payment channels including cards, bank-account payments, temporary bank-transfer accounts, and other supported methods. It also states that transfer confirmation is asynchronous and should use a webhook, which is why the build keeps payment server-side and does not mark an order paid based only on browser return.[2]
+
+Flutterwave’s official webhook documentation similarly requires signature verification, server-side transaction verification, fast acknowledgement, and idempotent event processing. Those are documented as launch requirements for the Flutterwave adapter rather than simulated as already complete.[3]
+
+GIG Logistics states that its APIs can automate shipments, enable real-time tracking, and integrate delivery features directly into websites and apps. Its ecommerce page also describes payment-on-delivery, reverse logistics, last-mile delivery, and live tracking capabilities. The build therefore includes city-based manual delivery estimates now and a GIGL adapter boundary for live credentials later.[4] [5]
+
+## What was built
+
+| Area | Delivered |
+|---|---|
+| Storefront | Sticky navigation, search, category browse, product detail, specs, condition, colors, stock messaging, cart, coupon, city selection, payment method selection, and order confirmation |
+| Admin | Overview metrics, revenue chart, low-stock watch, product catalog CRUD, edit drawer, stock increment/decrement, limited-stock flag, order statuses, coupon toggles, customer conversations, analytics, store settings, and integration readiness |
+| API | Health, products, product CRUD, orders, order status, coupon validation, analytics, shipping quote, Paystack initialization placeholder, and idempotent Paystack webhook record |
+| Portability | Vite + React frontend, Express server, environment-variable template, `npm run build`, `npm run start`, no Manus hosting dependency |
+| Documentation | Design system, brief, user flows, capability matrix, asset manifest, tool requests, QA checklist, research notes, and visual QA notes |
+
+## Verification performed
+
+The type check and production build pass with `npm run lint` and `npm run build`. The local API health endpoint returns a successful response. The browser review verified the storefront first screen, admin overview, product manager, product editor drawer, inventory restock view, cart, checkout fields, coupon calculation, cash-on-delivery selection, and pending-confirmation order success state. A temporary QA order was removed after endpoint testing so the committed demo store remains clean.
+
+A repair was required during QA: an admin setter was initially passed as the selected product value, which caused the product drawer to render during the storefront view. The state wiring was separated, the app reloaded correctly, and the build passed afterward. The implementation uses an honest provider-ready state; it does not claim that live gateway or logistics credentials are connected.
+
+## Deployment outside Manus
+
+Deploy the repository to Render, Railway, Fly.io, a VPS, or another Node host. Build with `npm run build`, start with `npm run start`, and configure `.env` values in the host dashboard. The server serves `dist` and the API under `/api`. Attach the dealer’s domain and TLS through the selected provider. For real multi-user operation, migrate the JSON repository to PostgreSQL/MySQL and add authentication and staff roles before launch.
+
+| Launch layer | Demo implementation | Production handoff |
+|---|---|---|
+| Persistence | `data/store.json` | PostgreSQL/MySQL repository with migrations and backups |
+| Payments | Provider-ready UI plus Paystack demo fallback | Paystack or Flutterwave secret, hosted checkout, transaction verification, signed webhook, idempotency |
+| Delivery | Manual city rates for Lagos, Abuja, Port Harcourt, Ibadan, and Other | GIGL or another logistics API for live quote, shipment, tracking, and reverse logistics |
+| Notifications | Local admin conversation demo | WhatsApp, email, SMS, or support inbox transport |
+| Access control | Demo workspace | Owner/staff authentication, roles, audit trail, rate limits |
+| Catalog media | Local hero asset and CSS product scenes | Dealer-owned photos, storage bucket, product image upload and optimization |
+
+## Commercial packaging recommendation
+
+The ₦50,000 package should include rebranding, catalog loading for a limited number of products, basic deployment, and a short handover. The ₦100,000 package should include custom styling, a larger catalog import, policy pages, payment/shipping setup support, analytics configuration, and a launch walkthrough. Domain, hosting, gateway fees, SMS/email, logistics, photography, and ongoing maintenance should be separate charges.
+
+The most defensible sales message is: **“A dealer-owned online shop and admin system that lets you update products, stock, prices, coupons, orders, delivery, and revenue from anywhere.”** Do not promise unrestricted custom development at this price. Sell the reusable core with paid add-ons for live gateways, GIGL integration, WhatsApp notifications, SQL migration, staff accounts, SEO, and maintenance.
+
+## References
+
+[1]: https://slot.ng/categories/laptops "SLOT Nigeria — laptops category"
+[2]: https://paystack.com/docs/payments/payment-channels/ "Paystack — Payment Channels"
+[3]: https://developer.flutterwave.com/v3.0/docs/webhooks "Flutterwave — Webhooks"
+[4]: https://giglogistics.com/developer/ "GIG Logistics — Developer / API"
+[5]: https://giglogistics.com/e-commerce/ "GIG Logistics — E-commerce Services"
